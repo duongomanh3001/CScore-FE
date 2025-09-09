@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRoleAccess } from "@/hooks/useRoleAccess";
+import MainLayout from "@/components/layouts/MainLayout";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -43,67 +44,69 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-[70vh] flex items-start md:items-center justify-center px-4">
-      <div className="w-full max-w-xl mt-10 md:mt-0">
-        <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
-          <div className="px-6 pt-6 text-center">
-            <h1 className="text-[#ff6a00] font-bold text-xl leading-tight">
-              CSCORE LOGIN
-            </h1>
-          </div>
-          <form onSubmit={onSubmit} className="p-6 space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-                {error}
-              </div>
-            )}
-            <input
-              type="text"
-              placeholder="Tên tài khoản hoặc Email"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-md border h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              disabled={isLoading}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Mật khẩu"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              disabled={isLoading}
-              required
-            />
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-10 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Đang đăng nhập...
-                </>
-              ) : (
-                "Đăng nhập"
+    <MainLayout>
+      <div className="min-h-[70vh] flex items-start md:items-center justify-center px-4">
+        <div className="w-full max-w-xl mt-10 md:mt-0">
+          <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="px-6 pt-6 text-center">
+              <h1 className="text-[#ff6a00] font-bold text-xl leading-tight">
+                CSCORE LOGIN
+              </h1>
+            </div>
+            <form onSubmit={onSubmit} className="p-6 space-y-4">
+              {error && (
+                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                  {error}
+                </div>
               )}
-            </button>
-            <div className="text-right">
-              <a href="#" className="text-emerald-700 text-sm">Quên mật khẩu?</a>
-            </div>
-            <div className="flex items-center justify-between pt-2">
-              <select className="h-9 rounded-md border px-2 text-sm">
-                <option>Vietnamese</option>
-                <option>English</option>
-              </select>
-              <button type="button" className="h-9 rounded-md border px-3 text-sm">
-                Thông báo từ các Cookies
+              <input
+                type="text"
+                placeholder="Tên tài khoản hoặc Email"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full rounded-md border h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                disabled={isLoading}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Mật khẩu"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-md border h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                disabled={isLoading}
+                required
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-10 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Đang đăng nhập...
+                  </>
+                ) : (
+                  "Đăng nhập"
+                )}
               </button>
-            </div>
-          </form>
+              <div className="text-right">
+                <a href="#" className="text-emerald-700 text-sm">Quên mật khẩu?</a>
+              </div>
+              <div className="flex items-center justify-between pt-2">
+                <select className="h-9 rounded-md border px-2 text-sm">
+                  <option>Vietnamese</option>
+                  <option>English</option>
+                </select>
+                <button type="button" className="h-9 rounded-md border px-3 text-sm">
+                  Thông báo từ các Cookies
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }

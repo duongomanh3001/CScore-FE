@@ -8,6 +8,7 @@ import { UserService } from '@/services/user.service';
 import { CourseService } from '@/services/course.service';
 import { Role } from '@/types/auth';
 import { Toaster } from 'react-hot-toast';
+import MainLayout from '@/components/layouts/MainLayout';
 
 interface DashboardStats {
   totalUsers: number;
@@ -289,9 +290,10 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Toaster position="top-right" />
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <MainLayout>
+      <div className="min-h-screen bg-slate-50">
+        <Toaster position="top-right" />
+        <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
@@ -347,7 +349,8 @@ export default function AdminDashboard() {
             loadDashboardStats(); // Refresh stats after import
           }}
         />
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }

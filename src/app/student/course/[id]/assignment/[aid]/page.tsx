@@ -8,6 +8,7 @@ import { use } from "react";
 import { AssignmentService } from "@/services/assignment.service";
 import { CourseService } from "@/services/course.service";
 import { StudentAssignmentResponse, CourseResponse } from "@/types/api";
+import MainLayout from "@/components/layouts/MainLayout";
 
 type Props = { params: Promise<{ id: string; aid: string }> };
 
@@ -55,29 +56,34 @@ function AssignmentDetails({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-6">
-        <div className="animate-pulse">
-          <div className="h-6 bg-slate-200 rounded w-64 mb-4"></div>
-          <div className="h-64 bg-slate-200 rounded-lg"></div>
+      <MainLayout>
+        <div className="mx-auto max-w-7xl px-4 py-6">
+          <div className="animate-pulse">
+            <div className="h-6 bg-slate-200 rounded w-64 mb-4"></div>
+            <div className="h-64 bg-slate-200 rounded-lg"></div>
+          </div>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
   if (error || !course || !assignment) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10 space-y-2">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <p className="text-red-600">{error || 'Không tìm thấy bài tập'}</p>
+      <MainLayout>
+        <div className="mx-auto max-w-7xl px-4 py-10 space-y-2">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+            <p className="text-red-600">{error || 'Không tìm thấy bài tập'}</p>
+          </div>
+          <Link href={`/student/course/${resolvedParams.id}`} className="text-blue-600 hover:underline">← Quay lại khóa học</Link>
         </div>
-        <Link href={`/student/course/${resolvedParams.id}`} className="text-blue-600 hover:underline">← Quay lại khóa học</Link>
-      </div>
+      </MainLayout>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
-      {/* breadcrumb-like header */}
+    <MainLayout>
+      <div className="mx-auto max-w-7xl px-4 py-6">
+        {/* breadcrumb-like header */}
       <div className="flex items-center gap-2 text-xs text-slate-500">
         <Link href="/student" className="hover:underline">Trang chủ</Link>
         <span>/</span>
@@ -248,8 +254,9 @@ function AssignmentDetails({ params }: Props) {
             </Link>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }
 

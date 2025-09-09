@@ -8,6 +8,7 @@ import { use } from "react";
 import { CourseService } from "@/services/course.service";
 import { AssignmentService } from "@/services/assignment.service";
 import { CourseResponse, StudentAssignmentResponse } from "@/types/api";
+import MainLayout from "@/components/layouts/MainLayout";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -58,35 +59,40 @@ function CourseDetails({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-6">
-        <div className="animate-pulse">
-          <div className="h-6 bg-slate-200 rounded w-64 mb-6"></div>
-          <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-            <div className="h-64 bg-slate-200 rounded-lg"></div>
-            <div className="h-64 bg-slate-200 rounded-lg"></div>
+      <MainLayout>
+        <div className="mx-auto max-w-7xl px-4 py-6">
+          <div className="animate-pulse">
+            <div className="h-6 bg-slate-200 rounded w-64 mb-6"></div>
+            <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+              <div className="h-64 bg-slate-200 rounded-lg"></div>
+              <div className="h-64 bg-slate-200 rounded-lg"></div>
+            </div>
           </div>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
   if (error || !course) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-          <p className="text-red-600">{error || 'Không tìm thấy khóa học'}</p>
+      <MainLayout>
+        <div className="mx-auto max-w-7xl px-4 py-10">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+            <p className="text-red-600">{error || 'Không tìm thấy khóa học'}</p>
+          </div>
+          <Link className="text-blue-600 hover:underline" href="/student">← Quay lại danh sách khóa học</Link>
         </div>
-        <Link className="text-blue-600 hover:underline" href="/student">← Quay lại danh sách khóa học</Link>
-      </div>
+      </MainLayout>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
-      <div className="mb-4">
-        <h1 className="text-[#ff6a00] font-semibold text-xl">{course.name}</h1>
-        <p className="text-slate-600 text-sm mt-1">{course.code} - {course.description}</p>
-      </div>
+    <MainLayout>
+      <div className="mx-auto max-w-7xl px-4 py-6">
+        <div className="mb-4">
+          <h1 className="text-[#ff6a00] font-semibold text-xl">{course.name}</h1>
+          <p className="text-slate-600 text-sm mt-1">{course.code} - {course.description}</p>
+        </div>
 
       <div className="mt-4 grid gap-6 grid-cols-1 md:grid-cols-[240px_1fr]">
         {/* Left sidebar */}
@@ -175,7 +181,8 @@ function CourseDetails({ params }: Props) {
           </div>
         </section>
       </div>
-    </div>
+      </div>
+    </MainLayout>
   );
 }
 

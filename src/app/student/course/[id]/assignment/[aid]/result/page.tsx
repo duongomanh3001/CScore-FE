@@ -6,6 +6,7 @@ import { use } from "react";
 import { AssignmentService } from "@/services/assignment.service";
 import { CourseService } from "@/services/course.service";
 import { StudentAssignmentResponse, CourseResponse, SubmissionResponse } from "@/types/api";
+import MainLayout from "@/components/layouts/MainLayout";
 
 type Props = { params: Promise<{ id: string; aid: string }> };
 

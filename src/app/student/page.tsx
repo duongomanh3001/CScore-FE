@@ -11,6 +11,7 @@ import { DashboardService } from "@/services/dashboard.service";
 import { AssignmentService } from "@/services/assignment.service";
 import { CourseResponse, StudentDashboardResponse, StudentAssignmentResponse } from "@/types/api";
 import Link from "next/link";
+import MainLayout from "@/components/layouts/MainLayout";
 
 function StudentDashboard() {
   const [courses, setCourses] = useState<CourseResponse[]>([]);
@@ -37,7 +38,12 @@ function StudentDashboard() {
         setDashboardData(dashboard);
         setAssignments(availableAssignments);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi tải dữ liệu');
+        const errorMessage = err instanceof Error ? err.message : 'Có lỗi xảy ra khi tải dữ liệu';
+        if (errorMessage.includes('không mong muốn') || errorMessage.includes('Network Error') || errorMessage.includes('failed to fetch')) {
+          setError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng hoặc liên hệ quản trị viên.');
+        } else {
+          setError(errorMessage);
+        }
         console.error('Failed to fetch student data:', err);
       } finally {
         setLoading(false);
@@ -74,7 +80,8 @@ function StudentDashboard() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
+    <MainLayout>
+      <div className="mx-auto max-w-7xl px-4 py-6">
       {/* Welcome Section */}
       <div className="mb-6">
         <h1 className="text-[#ff6a00] font-semibold text-xl">
@@ -151,7 +158,8 @@ function StudentDashboard() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </MainLayout>
   );
 }
 
