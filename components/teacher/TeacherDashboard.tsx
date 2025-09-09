@@ -32,18 +32,6 @@ export default function TeacherDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
 
-  // Redirect if not teacher
-  if (!hasRole(Role.TEACHER)) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-2">Truy cập bị từ chối</h1>
-          <p className="text-slate-600">Bạn không có quyền truy cập trang này.</p>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (user?.id) {
       loadDashboardData();
@@ -63,7 +51,7 @@ export default function TeacherDashboard() {
       ]);
 
       // Calculate stats
-      const totalStudents = courses.reduce((sum: number, course: any) => sum + (course.currentStudentCount || 0), 0);
+      const totalStudents = courses.reduce((sum: number, course: CourseResponse) => sum + (course.currentStudentCount || 0), 0);
 
       setStats({
         totalCourses: courses.length,
@@ -75,12 +63,23 @@ export default function TeacherDashboard() {
       setRecentCourses(courses.slice(0, 5));
       setRecentAssignments(assignments.slice(0, 5));
     } catch (err) {
-      console.error('Error loading dashboard data:', err);
-      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi tải dữ liệu');
+      setError(err instanceof Error ? err.message : 'Không thể tải dữ liệu dashboard');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Redirect if not teacher
+  if (!hasRole(Role.TEACHER)) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-2">Truy cập bị từ chối</h1>
+          <p className="text-slate-600">Bạn không có quyền truy cập trang này.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAssignmentCreated = () => {
     setShowAssignmentForm(false);

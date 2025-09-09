@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function UnauthorizedPage() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-4">
@@ -7,12 +9,12 @@ export default function UnauthorizedPage() {
         <p className="text-slate-500 mb-6">
           Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.
         </p>
-        <a
+        <Link
           href="/"
           className="inline-block bg-emerald-600 text-white px-6 py-2 rounded-md hover:bg-emerald-700"
         >
           Về trang chủ
-        </a>
+        </Link>
       </div>
     </div>
   );

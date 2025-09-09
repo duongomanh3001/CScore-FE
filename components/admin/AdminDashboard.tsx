@@ -34,18 +34,6 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Redirect if not admin
-  if (!hasRole(Role.ADMIN)) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-2">Truy cập bị từ chối</h1>
-          <p className="text-slate-600">Bạn không có quyền truy cập trang này.</p>
-        </div>
-      </div>
-    );
-  }
-
   useEffect(() => {
     loadDashboardStats();
   }, []);
@@ -78,6 +66,18 @@ export default function AdminDashboard() {
       setIsLoading(false);
     }
   };
+
+  // Redirect if not admin
+  if (!hasRole(Role.ADMIN)) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-2">Truy cập bị từ chối</h1>
+          <p className="text-slate-600">Bạn không có quyền truy cập trang này.</p>
+        </div>
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'overview', label: 'Tổng quan', icon: '📊' },
