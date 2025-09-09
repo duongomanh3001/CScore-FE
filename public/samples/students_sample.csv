@@ -1,0 +1,6 @@
+username,email,fullName,studentId,password
+student1,student1@example.com,Nguyễn Văn D,20210001,password123
+student2,student2@example.com,Trần Thị E,20210002,password123
+student3,student3@example.com,Lê Văn F,20210003,password123
+student4,student4@example.com,Phạm Thị G,20210004,password123
+student5,student5@example.com,Hoàng Văn H,20210005,password123

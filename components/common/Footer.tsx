@@ -1,0 +1,38 @@
+export default function Footer() {
+  return (
+    <footer className="bg-slate-900 text-slate-200 mt-20">
+      <div className="mx-auto max-w-7xl px-4 py-12 grid gap-8 md:grid-cols-2">
+        <div>
+          <div className="flex items-center gap-2 font-semibold text-lg">
+            <img src="/logo-cscore-light.svg" alt="CSCORE" className="h-6 w-6" />
+            <span>HỆ THỐNG CHẤM ĐIỂM TỰ ĐỘNG CSCORE</span>
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div>
+            <h4 className="text-white font-semibold mb-3">Liên kết</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:underline">Website Nhà Trường</a></li>
+              <li><a href="#" className="hover:underline">Website Trung tâm CNHT</a></li>
+              <li><a href="#" className="hover:underline">Cổng Thông Tin Sinh Viên</a></li>
+              <li><a href="#courses" className="hover:underline">Các Khóa Học</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-semibold mb-3">Liên hệ</h4>
+            <div className="text-sm space-y-2">
+              <p><span className="font-semibold">Trung tâm Quản trị</span> Công nghiệp TP.HCM</p>
+              <p>Phone: 028.3940.390 - ext 838</p>
+              <p>E-mail: csm@uh.edu.vn</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="border-t border-slate-800">
+        <div className="mx-auto max-w-7xl px-4 py-4 text-xs text-center text-slate-400">
+          Copyright © 2025 - CSCORE
+        </div>
+      </div>
+    </footer>
+  );
+}
