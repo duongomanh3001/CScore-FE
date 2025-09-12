@@ -1,11 +1,11 @@
 'use client';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import Hero from '../../components/ui/Hero';
-import Navbar from '../../components/common/Navbar';
-import Footer from '../../components/common/Footer';
+import Hero from '@/components/ui/Hero';
+import Navbar from '@/components/common/Navbar';
+import Footer from '@/components/common/Footer';
 
 export default function Home() {
   const { state } = useAuth();

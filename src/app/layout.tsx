@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Open_Sans, Noto_Sans } from "next/font/google";
 import "./globals.css";
-import ClientOnlyWrapper from "../../components/common/ClientOnlyWrapper";
-import { AuthProvider } from "../../contexts/AuthContext";
+import ClientOnlyWrapper from "@/components/common/ClientOnlyWrapper";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
