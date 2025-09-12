@@ -22,4 +22,10 @@ public class StudentQuestionResponse {
     private Boolean isAnswered;
     private String userAnswer;
     private List<Long> selectedOptionIds;
+    
+    // Programming-specific fields
+    private String starterCode;
+    private List<PublicTestCaseResponse> exampleTestCases;
+    private String language;
+    private Integer totalTestCases;
 }

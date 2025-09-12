@@ -31,12 +31,8 @@ import java.util.concurrent.CompletableFuture;
 public class AutoGradingService {
     
     private final HybridCodeExecutionService hybridCodeExecutionService;
-    private final Judge0Service judge0Service;
     private final SubmissionRepository submissionRepository;
     private final TestResultRepository testResultRepository;
-    
-    @Value("${grading.use-judge0:false}")
-    private boolean useJudge0;
     
     @Value("${grading.time-limit:30}")
     private int defaultTimeLimit;
@@ -134,14 +130,8 @@ public class AutoGradingService {
             return executeMultiQuestionSubmission(submission, testCases);
         }
         
-        if (useJudge0) {
-            // Use Judge0 service for execution
-            ProgrammingLanguage progLang = ProgrammingLanguage.valueOf(language.toUpperCase());
-            return judge0Service.executeCode(code, progLang, testCases);
-        } else {
-            // Use local code execution service
-            return hybridCodeExecutionService.executeCodeWithTestCases(code, language, testCases, submission);
-        }
+        // Use hybrid execution service (JOBE + Local fallback)
+        return hybridCodeExecutionService.executeCodeWithTestCases(code, language, testCases, submission);
     }
     
     /**
@@ -205,14 +195,8 @@ public class AutoGradingService {
             }
             
             // Execute this question's code with its test cases
-            CodeExecutionResponse questionResponse;
-            if (useJudge0) {
-                ProgrammingLanguage progLang = ProgrammingLanguage.valueOf(language.toUpperCase());
-                questionResponse = judge0Service.executeCode(questionCode, progLang, questionTestCases);
-            } else {
-                questionResponse = hybridCodeExecutionService.executeCodeWithTestCases(
-                    questionCode, language, questionTestCases, null);
-            }
+            CodeExecutionResponse questionResponse = hybridCodeExecutionService.executeCodeWithTestCases(
+                questionCode, language, questionTestCases, null);
             
             if (!questionResponse.isSuccess()) {
                 // If any question fails compilation, mark entire submission as failed

@@ -18,11 +18,6 @@ public class TestResult {
     private Long id;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "submission_id", nullable = false)
-    @JsonIgnore
-    private Submission submission;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_case_id", nullable = false)
     @JsonIgnore
     private TestCase testCase;
@@ -31,6 +26,11 @@ public class TestResult {
     @JoinColumn(name = "question_submission_id")
     @JsonIgnore
     private QuestionSubmission questionSubmission;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "submission_id")
+    @JsonIgnore
+    private Submission submission;
     
     @Column(name = "actual_output", columnDefinition = "TEXT")
     private String actualOutput;
@@ -42,7 +42,7 @@ public class TestResult {
     private Long executionTime; // milliseconds
     
     @Column(name = "memory_used")
-    private Long memoryUsed; // bytes
+    private Long memoryUsed;
     
     @Column(columnDefinition = "TEXT")
     private String errorMessage;

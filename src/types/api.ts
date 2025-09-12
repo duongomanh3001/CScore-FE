@@ -238,6 +238,11 @@ export interface StudentQuestionResponse {
   isAnswered: boolean;
   userAnswer?: string;
   selectedOptionIds?: number[];
+  // New fields for enhanced programming questions
+  starterCode?: string;        // Template code for students
+  exampleTestCases?: TestCaseResponse[];  // Test cases marked as examples
+  language?: string;           // Programming language for this question
+  totalTestCases?: number;     // Total number of test cases (including hidden)
 }
 
 export interface SubmissionRequest {
@@ -269,6 +274,19 @@ export interface SubmissionResponse {
   gradedTime?: string;
   testCasesPassed?: number;
   totalTestCases?: number;
+  // Enhanced details
+  questionResults?: QuestionResultResponse[];
+}
+
+export interface QuestionResultResponse {
+  questionId: number;
+  questionTitle: string;
+  questionType: 'PROGRAMMING' | 'MULTIPLE_CHOICE' | 'ESSAY' | 'TRUE_FALSE';
+  maxScore: number;
+  earnedScore: number;
+  status: 'CORRECT' | 'INCORRECT' | 'PARTIAL' | 'NOT_ANSWERED';
+  testCaseResults?: TestResultResponse[];
+  feedback?: string;
 }
 
 export interface TestResultResponse {
@@ -290,6 +308,10 @@ export interface CodeExecutionResponse {
   memoryUsage?: number;
   testResults?: TestResultResponse[];
   compilationError?: string;
+  message?: string; // System message explaining the grading process
+  passedTests?: number;
+  totalTests?: number;
+  score?: number;
 }
 
 export interface TeacherDashboardResponse {

@@ -28,14 +28,28 @@ public class QuestionSubmission {
 
     @Column(columnDefinition = "TEXT")
     private String code;
-
+    
     @Column(name = "programming_language", length = 50)
     private String programmingLanguage;
-
+    
     @Column(columnDefinition = "DOUBLE DEFAULT 0")
     private Double score = 0.0;
-
-    @Enumerated(EnumType.STRING)
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id")
+    private User student;
+    
+    @Column(columnDefinition = "TEXT")
+    private String submittedAnswer;
+    
+    @Column(name = "is_correct")
+    private Boolean isCorrect;
+    
+    @Column(name = "submission_time")
+    private LocalDateTime submissionTime;
+    
+    @Column(name = "is_final_submission")
+    private Boolean isFinalSubmission = false;    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SubmissionStatus status = SubmissionStatus.NOT_SUBMITTED;
 

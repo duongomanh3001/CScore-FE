@@ -11,6 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 public class CodeExecutionResponse {
     private boolean success;
+    
+    // Explicit getter for boolean field
+    public boolean isSuccess() {
+        return success;
+    }
     private String output;
     private String error;
     private String language;

@@ -227,7 +227,7 @@ public class StudentDashboardService {
     }
     
     private StudentQuestionResponse convertToStudentQuestionResponse(Question question, User student) {
-        // Get public test cases for this question
+        // Get public test cases for this question (example test cases)
         List<PublicTestCaseResponse> publicTestCases = testCaseRepository.findByQuestionAndIsHiddenFalse(question)
             .stream()
             .map(this::convertToPublicTestCaseResponse)
@@ -249,6 +249,9 @@ public class StudentDashboardService {
         String userAnswer = null;
         List<Long> selectedOptionIds = new ArrayList<>();
         
+        // Calculate total test cases for this question
+        int totalTestCases = question.getTestCases().size();
+        
         return new StudentQuestionResponse(
             question.getId(),
             question.getTitle(),
@@ -256,11 +259,16 @@ public class StudentDashboardService {
             question.getQuestionType(),
             question.getPoints(),
             question.getOrderIndex(),
-            publicTestCases,
+            publicTestCases, // This serves as both publicTestCases and exampleTestCases
             options,
             isAnswered,
             userAnswer,
-            selectedOptionIds
+            selectedOptionIds,
+            // Enhanced fields for programming questions
+            question.getStarterCode(), // starterCode
+            publicTestCases, // exampleTestCases (same as publicTestCases)
+            question.getLanguage(), // language
+            totalTestCases // totalTestCases
         );
     }
     

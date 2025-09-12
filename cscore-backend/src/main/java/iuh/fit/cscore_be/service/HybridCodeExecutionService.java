@@ -71,15 +71,39 @@ public class HybridCodeExecutionService {
         log.info("Executing code with {} test cases using strategy: {} for language: {}", 
                 testCases.size(), strategy, language);
         
+        CodeExecutionResponse response;
         switch (strategy) {
             case JOBE:
-                return executeWithTestCasesJobe(code, language, testCases, submission);
+                response = executeWithTestCasesJobe(code, language, testCases, submission);
+                break;
             case LOCAL:
-                return executeWithTestCasesLocal(code, language, testCases, submission);
+                response = executeWithTestCasesLocal(code, language, testCases, submission);
+                break;
             case HYBRID:
             default:
-                return executeWithTestCasesHybrid(code, language, testCases, submission);
+                response = executeWithTestCasesHybrid(code, language, testCases, submission);
+                break;
         }
+        
+        // Add detailed message about auto-grading process if not already set
+        if (response != null && (response.getMessage() == null || response.getMessage().isEmpty())) {
+            if (response.isSuccess()) {
+                int passedTests = response.getPassedTests();
+                int totalTests = response.getTotalTests();
+                response.setMessage(String.format(
+                    "Chấm điểm tự động hoàn thành: Code của bạn được thực thi với %d test case(s) từ giảng viên. " +
+                    "Kết quả: %d/%d test case(s) đạt yêu cầu. " +
+                    "Điểm số được tính dựa trên output thực tế so với expected output và trọng số của từng test case. " +
+                    "Không có so sánh trực tiếp code với đáp án của giảng viên.",
+                    totalTests, passedTests, totalTests
+                ));
+            } else {
+                response.setMessage("Chấm điểm tự động: Code có lỗi trong quá trình biên dịch hoặc thực thi. " +
+                    "Hệ thống không thể chạy test cases. Vui lòng kiểm tra lại code và thử lại.");
+            }
+        }
+        
+        return response;
     }
 
     /**

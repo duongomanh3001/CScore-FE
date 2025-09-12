@@ -21,6 +21,8 @@ public interface QuestionSubmissionRepository extends JpaRepository<QuestionSubm
     
     Optional<QuestionSubmission> findBySubmissionAndQuestion(Submission submission, Question question);
     
+    Optional<QuestionSubmission> findByQuestionIdAndStudentId(Long questionId, Long studentId);
+    
     List<QuestionSubmission> findBySubmissionAndStatus(Submission submission, SubmissionStatus status);
     
     @Query("SELECT qs FROM QuestionSubmission qs WHERE qs.submission.id = :submissionId AND qs.question.questionType = 'PROGRAMMING'")

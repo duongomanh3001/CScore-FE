@@ -37,8 +37,34 @@ class ApiClient {
       const response = await fetch(url, config);
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        let errorMessage = '';
+        let errorData: any = {};
+        
+        try {
+          errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || '';
+        } catch (parseError) {
+          // Response is not JSON or empty
+          console.warn('Could not parse error response as JSON:', parseError);
+        }
+
+        // Create a more descriptive error message
+        switch (response.status) {
+          case 400:
+            throw new Error(errorMessage || 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin đã nhập.');
+          case 401:
+            throw new Error(errorMessage || 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+          case 403:
+            throw new Error(errorMessage || 'Bạn không có quyền thực hiện hành động này.');
+          case 404:
+            throw new Error(errorMessage || 'Không tìm thấy tài nguyên yêu cầu.');
+          case 500:
+            throw new Error(errorMessage || 'Lỗi server nội bộ. Vui lòng thử lại sau.');
+          case 503:
+            throw new Error(errorMessage || 'Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau.');
+          default:
+            throw new Error(errorMessage || `Lỗi HTTP! Mã trạng thái: ${response.status}`);
+        }
       }
 
       const contentType = response.headers.get('content-type');
@@ -48,7 +74,14 @@ class ApiClient {
       
       return {} as T;
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error('API request failed:', { url, error });
+      
+      // Handle network errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng và thử lại.');
+      }
+      
+      // Re-throw our custom errors or other errors as-is
       throw error;
     }
   }

@@ -7,8 +7,10 @@ import { Role } from "@/types/auth";
 import { use } from "react";
 import { AssignmentService } from "@/services/assignment.service";
 import { CourseService } from "@/services/course.service";
+import { HealthService } from "@/services/health.service";
 import { StudentAssignmentResponse, StudentQuestionResponse, CourseResponse } from "@/types/api";
 import MainLayout from "@/components/layouts/MainLayout";
+import ProgrammingQuestionComponent from "@/components/student/ProgrammingQuestionComponent";
 
 type Props = { params: Promise<{ id: string; aid: string }> };
 
@@ -216,10 +218,28 @@ function AssignmentAttempt({ params }: Props) {
         await AssignmentService.submitAssignment(submissionData);
       }
       
+      // Show success message before redirecting
+      alert('Nộp bài thành công!');
+      
       // Redirect to results page
       window.location.href = `/student/course/${course?.id}/assignment/${assignment.id}/result`;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi nộp bài');
+      console.error('Submission error:', err);
+      
+      let errorMessage = 'Có lỗi xảy ra khi nộp bài';
+      
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
+      // Add additional context for common issues
+      if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('kết nối')) {
+        errorMessage += '\n\nVui lòng kiểm tra:\n- Kết nối internet\n- Server có đang hoạt động không\n- Thử tải lại trang và nộp lại';
+      }
+      
+      setError(errorMessage);
       setIsSubmitting(false);
     }
   };
@@ -404,177 +424,21 @@ function AssignmentAttempt({ params }: Props) {
 
             {/* Answer Input based on question type */}
             {currentQuestion.questionType === 'PROGRAMMING' && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Nhập code của bạn:
-                </label>
-                <textarea
-                  value={answers[currentQuestion.id]?.answer || ''}
-                  onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-                  placeholder="// Viết code của bạn ở đây..."
-                  className="w-full min-h-[200px] rounded border p-3 text-sm font-mono text-black focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
-                
-                {/* Warning about code changes */}
-                {testResults[currentQuestion.id] && (
-                  <div className="mt-2 text-xs text-orange-600 bg-orange-50 p-2 rounded">
-                    Code đã được thay đổi. Kết quả test trước đây có thể không còn chính xác.
-                  </div>
-                )}
-                
-                {/* Check button */}
-                <div className="mt-3 flex justify-between items-center">
-                  <div className="text-xs text-slate-500">
-                    {answers[currentQuestion.id]?.answer?.trim() ? (
-                      <span className="text-blue-600">✓ Code đã nhập - có thể kiểm tra</span>
-                    ) : (
-                      <span>Nhập code để có thể kiểm tra</span>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => handleCheckQuestion(currentQuestion.id)}
-                    disabled={checkingQuestions[currentQuestion.id] || !answers[currentQuestion.id]?.answer?.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                  >
-                    {checkingQuestions[currentQuestion.id] ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        Đang kiểm tra...
-                      </>
-                    ) : (
-                      'Check'
-                    )}
-                  </button>
-                </div>
-
-                {/* Test Results */}
-                {testResults[currentQuestion.id] && (
-                  <div className="mt-4 border rounded-lg overflow-hidden">
-                    <div className="bg-slate-50 px-3 py-2 border-b">
-                      <h4 className="font-medium text-slate-700">Kết quả kiểm tra:</h4>
-                    </div>
-                    
-                    {testResults[currentQuestion.id].success ? (
-                      <div className="bg-green-50 p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                          </div>
-                          <span className="font-medium text-green-800">Passed all tests! ✓</span>
-                        </div>
-                        
-                        {testResults[currentQuestion.id].testCases && (
-                          <div className="space-y-2">
-                            <table className="w-full text-sm">
-                              <thead>
-                                <tr className="bg-green-100">
-                                  <th className="text-left px-3 py-1 border">Test</th>
-                                  <th className="text-left px-3 py-1 border">Expected</th>
-                                  <th className="text-left px-3 py-1 border">Got</th>
-                                  <th className="text-center px-3 py-1 border w-12"></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {testResults[currentQuestion.id].testCases.map((test: any, index: number) => (
-                                  <tr key={index} className="bg-white">
-                                    <td className="px-3 py-1 border font-mono text-xs">{test.input}</td>
-                                    <td className="px-3 py-1 border font-mono text-xs">{test.expected}</td>
-                                    <td className="px-3 py-1 border font-mono text-xs">{test.actual}</td>
-                                    <td className="px-3 py-1 border text-center">
-                                      <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center mx-auto">
-                                        <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
-                        
-                        <div className="mt-3 text-sm">
-                          <div className="bg-green-600 text-white px-2 py-1 rounded inline-block">
-                            Correct
-                          </div>
-                          <span className="ml-2 text-green-700">
-                            Marks for this submission: {testResults[currentQuestion.id].score || currentQuestion.points}/{currentQuestion.points}
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="bg-red-50 p-4">
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                          </div>
-                          <span className="font-medium text-red-800">Test failed</span>
-                        </div>
-                        
-                        {testResults[currentQuestion.id].testCases && (
-                          <div className="space-y-2">
-                            <table className="w-full text-sm">
-                              <thead>
-                                <tr className="bg-red-100">
-                                  <th className="text-left px-3 py-1 border">Test</th>
-                                  <th className="text-left px-3 py-1 border">Expected</th>
-                                  <th className="text-left px-3 py-1 border">Got</th>
-                                  <th className="text-center px-3 py-1 border w-12"></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {testResults[currentQuestion.id].testCases.map((test: any, index: number) => (
-                                  <tr key={index} className={test.passed ? "bg-green-50" : "bg-red-50"}>
-                                    <td className="px-3 py-1 border font-mono text-xs">{test.input}</td>
-                                    <td className="px-3 py-1 border font-mono text-xs">{test.expected}</td>
-                                    <td className="px-3 py-1 border font-mono text-xs">{test.actual}</td>
-                                    <td className="px-3 py-1 border text-center">
-                                      {test.passed ? (
-                                        <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center mx-auto">
-                                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
-                                          </svg>
-                                        </div>
-                                      ) : (
-                                        <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center mx-auto">
-                                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path>
-                                          </svg>
-                                        </div>
-                                      )}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
-
-                        {testResults[currentQuestion.id].error && (
-                          <div className="mt-3 p-3 bg-red-100 rounded border border-red-200">
-                            <h5 className="font-medium text-red-800 mb-1">Runtime Error:</h5>
-                            <pre className="text-xs text-red-700 whitespace-pre-wrap">{testResults[currentQuestion.id].error}</pre>
-                          </div>
-                        )}
-                        
-                        <div className="mt-3 text-sm">
-                          <div className="bg-red-600 text-white px-2 py-1 rounded inline-block">
-                            Incorrect
-                          </div>
-                          <span className="ml-2 text-red-700">
-                            Marks for this submission: 0.00/{currentQuestion.points}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <ProgrammingQuestionComponent
+                question={currentQuestion}
+                answer={answers[currentQuestion.id]?.answer || ''}
+                onAnswerChange={(code: string) => handleAnswerChange(currentQuestion.id, code)}
+                onTestResults={(result: any) => setTestResults(prev => ({
+                  ...prev,
+                  [currentQuestion.id]: result
+                }))}
+                isChecking={checkingQuestions[currentQuestion.id] || false}
+                setIsChecking={(checking: boolean) => setCheckingQuestions(prev => ({
+                  ...prev,
+                  [currentQuestion.id]: checking
+                }))}
+                testResults={testResults[currentQuestion.id]}
+              />
             )}
 
             {currentQuestion.questionType === 'ESSAY' && (

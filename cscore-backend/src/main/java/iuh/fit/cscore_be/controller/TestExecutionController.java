@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/execution")
+@RequestMapping("/api/admin/test-execution")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"})
-public class ExecutionController {
+public class TestExecutionController {
 
     private final HybridCodeExecutionService hybridCodeExecutionService;
 

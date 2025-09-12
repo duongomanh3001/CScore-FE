@@ -35,6 +35,9 @@ public class JobeExecutionService {
     @Value("${jobe.server.enabled:false}")
     private boolean jobeEnabled;
     
+    @Value("${jobe.server.api-key:2AAA7A5F538F4E4B5C4A8B2E9AA2B248FFF}")
+    private String jobeApiKey;
+    
     private final ExecutorService executorService = Executors.newFixedThreadPool(
         Math.max(2, Runtime.getRuntime().availableProcessors() / 2)
     );
@@ -52,12 +55,14 @@ public class JobeExecutionService {
             log.info("Executing code via Jobe server - Language: {}", language);
             
             // Create request for Jobe server
-            Map<String, Object> request = createJobeRequest(code, language, null);
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("run_spec", createJobeRequest(code, language, null));
             
             // Send request to Jobe server
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+            headers.set("X-API-KEY", jobeApiKey);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
             
             String url = jobeServerUrl + "/jobe/index.php/restapi/runs";
             ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
@@ -83,12 +88,14 @@ public class JobeExecutionService {
             log.info("Executing code with input via Jobe server - Language: {}", language);
             
             // Create request for Jobe server with input
-            Map<String, Object> request = createJobeRequest(code, language, input);
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("run_spec", createJobeRequest(code, language, input));
             
             // Send request to Jobe server
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+            headers.set("X-API-KEY", jobeApiKey);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
             
             String url = jobeServerUrl + "/jobe/index.php/restapi/runs";
             ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
@@ -187,12 +194,14 @@ public class JobeExecutionService {
             long startTime = System.currentTimeMillis();
             
             // Create request for Jobe server
-            Map<String, Object> request = createJobeRequest(code, language, testCase.getInput());
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("run_spec", createJobeRequest(code, language, testCase.getInput()));
             
             // Send request to Jobe server
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+            headers.set("X-API-KEY", jobeApiKey);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
             
             String url = jobeServerUrl + "/jobe/index.php/restapi/runs";
             ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
@@ -258,6 +267,7 @@ public class JobeExecutionService {
         String jobeLanguageId = getJobeLanguageId(language);
         request.put("language_id", jobeLanguageId);
         request.put("sourcecode", code);
+        request.put("sourcefilename", getSourceFileName(language));
         
         // Set execution parameters
         Map<String, Object> parameters = new HashMap<>();
@@ -292,6 +302,28 @@ public class JobeExecutionService {
                 return "nodejs";
             default:
                 return language.toLowerCase();
+        }
+    }
+
+    /**
+     * Get source filename for JOBE based on language
+     */
+    private String getSourceFileName(String language) {
+        switch (language.toLowerCase()) {
+            case "java":
+                return "Main.java";
+            case "python":
+                return "main.py";
+            case "cpp":
+            case "c++":
+                return "main.cpp";
+            case "c":
+                return "main.c";
+            case "javascript":
+            case "js":
+                return "main.js";
+            default:
+                return "main." + language.toLowerCase();
         }
     }
 

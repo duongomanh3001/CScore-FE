@@ -5,7 +5,7 @@ import Link from "next/link";
 import { use } from "react";
 import { AssignmentService } from "@/services/assignment.service";
 import { CourseService } from "@/services/course.service";
-import { StudentAssignmentResponse, CourseResponse, SubmissionResponse } from "@/types/api";
+import { StudentAssignmentResponse, CourseResponse, SubmissionResponse, QuestionResultResponse } from "@/types/api";
 import MainLayout from "@/components/layouts/MainLayout";
 
 type Props = { params: Promise<{ id: string; aid: string }> };
@@ -207,9 +207,109 @@ export default function ResultPage({ params }: Props) {
                     </div>
                   </div>
                   
+                  {/* Detailed Score Breakdown */}
+                  {latestSubmission.questionResults && latestSubmission.questionResults.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="text-slate-900 font-medium mb-3">Chi tiết điểm từng câu:</h4>
+                      <div className="space-y-3">
+                        {latestSubmission.questionResults.map((questionResult) => (
+                          <div key={questionResult.questionId} className="border border-slate-200 rounded-lg p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <h5 className="font-medium text-slate-800">{questionResult.questionTitle}</h5>
+                              <div className="flex items-center gap-2">
+                                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                  questionResult.status === 'CORRECT' ? 'bg-green-100 text-green-800' :
+                                  questionResult.status === 'PARTIAL' ? 'bg-yellow-100 text-yellow-800' :
+                                  questionResult.status === 'INCORRECT' ? 'bg-red-100 text-red-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {questionResult.status === 'CORRECT' ? 'Đúng' :
+                                   questionResult.status === 'PARTIAL' ? 'Đúng một phần' :
+                                   questionResult.status === 'INCORRECT' ? 'Sai' :
+                                   'Chưa trả lời'}
+                                </span>
+                                <span className="text-sm font-medium">
+                                  {questionResult.earnedScore.toFixed(1)}/{questionResult.maxScore} điểm
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {questionResult.questionType === 'PROGRAMMING' && questionResult.testCaseResults && (
+                              <div className="mt-2">
+                                {/* Auto-grading explanation */}
+                                <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                                  <span className="font-medium text-blue-900">📋 Quy trình chấm điểm tự động:</span>
+                                  <span className="text-blue-800 ml-1">
+                                    Code của bạn được chạy với test cases từ giảng viên và so sánh output thực tế với expected output.
+                                  </span>
+                                </div>
+                                <div className="text-sm text-slate-600 mb-2">
+                                  Kết quả test cases: {questionResult.testCaseResults.filter(t => t.passed).length}/{questionResult.testCaseResults.length} đạt yêu cầu
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                  {questionResult.testCaseResults.map((testCase, index) => (
+                                    <div key={testCase.id} className={`p-2 rounded text-xs border ${
+                                      testCase.passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                                    }`}>
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="font-medium">Test {index + 1}</span>
+                                        <div className={`w-3 h-3 rounded-full ${
+                                          testCase.passed ? 'bg-green-500' : 'bg-red-500'
+                                        }`}></div>
+                                      </div>
+                                      <div className="space-y-1">
+                                        <div>
+                                          <span className="text-slate-600">Input:</span>
+                                          <div className="font-mono bg-white p-1 rounded border">
+                                            {testCase.input || '(empty)'}
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <span className="text-slate-600">Expected:</span>
+                                          <div className="font-mono bg-white p-1 rounded border">
+                                            {testCase.expectedOutput}
+                                          </div>
+                                        </div>
+                                        {testCase.actualOutput !== undefined && (
+                                          <div>
+                                            <span className="text-slate-600">Got:</span>
+                                            <div className={`font-mono p-1 rounded border ${
+                                              testCase.passed ? 'bg-green-50' : 'bg-red-50'
+                                            }`}>
+                                              {testCase.actualOutput || '(no output)'}
+                                            </div>
+                                          </div>
+                                        )}
+                                        {testCase.error && (
+                                          <div>
+                                            <span className="text-red-600">Error:</span>
+                                            <div className="font-mono bg-red-50 p-1 rounded border border-red-200 text-red-700">
+                                              {testCase.error}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {questionResult.feedback && (
+                              <div className="mt-2 p-2 bg-slate-50 rounded border">
+                                <div className="text-xs text-slate-600 mb-1">Feedback:</div>
+                                <div className="text-sm text-slate-800">{questionResult.feedback}</div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {latestSubmission.feedback && (
                     <div className="mt-4">
-                      <div className="text-slate-600 text-sm">Feedback</div>
+                      <div className="text-slate-600 text-sm">Feedback tổng:</div>
                       <div className="mt-1 p-3 bg-white border rounded text-sm">
                         {latestSubmission.feedback}
                       </div>

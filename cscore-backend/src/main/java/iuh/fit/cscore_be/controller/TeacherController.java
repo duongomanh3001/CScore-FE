@@ -1,6 +1,7 @@
 package iuh.fit.cscore_be.controller;
 
 import iuh.fit.cscore_be.dto.request.AssignmentRequest;
+import iuh.fit.cscore_be.dto.request.CodeValidationRequest;
 import iuh.fit.cscore_be.dto.request.CreateAssignmentRequest;
 import iuh.fit.cscore_be.dto.request.CourseRequest;
 import iuh.fit.cscore_be.dto.request.TestCaseRequest;
@@ -20,8 +21,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +35,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/teacher")
 @RequiredArgsConstructor
+@Slf4j
 public class TeacherController {
     
     private final TeacherDashboardService dashboardService;
@@ -41,6 +45,7 @@ public class TeacherController {
     private final UserService userService;
     private final AutoGradingService autoGradingService;
     private final CompilerService compilerService;
+    private final HybridCodeExecutionService hybridCodeExecutionService;
     
     // ======================== DASHBOARD ========================
     
@@ -396,6 +401,57 @@ public class TeacherController {
             return ResponseEntity.ok(supportedLanguages);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    // ======================== CODE VALIDATION ========================
+    
+    /**
+     * Validate teacher's answer code by executing it with test cases
+     * This is used during question creation to auto-generate expected outputs
+     */
+    @PostMapping("/validate-code")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<Map<String, Object>> validateAnswerCode(
+            @Valid @RequestBody CodeValidationRequest request,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        try {
+            log.info("Teacher {} is validating code for language: {}", 
+                    userPrincipal.getUsername(), request.getLanguage());
+            log.info("Code to execute: {}", request.getCode());
+            log.info("Input: {}", request.getInput());
+            
+            // Use the hybrid code execution service to execute the code
+            long startTime = System.currentTimeMillis();
+            var result = hybridCodeExecutionService.executeCodeWithInput(
+                    request.getCode(), 
+                    request.getLanguage(), 
+                    request.getInput()
+            );
+            long duration = System.currentTimeMillis() - startTime;
+            
+            // Prepare response in the format expected by frontend
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", result.isSuccess());
+            response.put("output", result.getOutput());
+            response.put("error", result.getError());
+            response.put("compilationError", result.getCompilationError());
+            response.put("executionTime", duration);
+            response.put("language", request.getLanguage());
+            
+            log.info("Code validation completed in {}ms, success: {}", duration, result.isSuccess());
+            log.info("Execution result - Output: {}, Error: {}", result.getOutput(), result.getError());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Error validating teacher's code", e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Code validation failed: " + e.getMessage());
+            
+            return ResponseEntity.ok(errorResponse);
         }
     }
 }

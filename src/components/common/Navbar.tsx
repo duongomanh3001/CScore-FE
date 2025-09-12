@@ -10,6 +10,10 @@ import { Role } from "@/types/auth";
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, getUserDisplayName, getRoleName, canAccessAdmin, canAccessTeacher } = useRoleAccess();
+  const { signOut } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -31,10 +35,6 @@ export default function Navbar() {
       </header>
     );
   }
-  const pathname = usePathname();
-  const router = useRouter();
-  const { isAuthenticated, getUserDisplayName, getRoleName, canAccessAdmin, canAccessTeacher } = useRoleAccess();
-  const { signOut } = useAuth();
 
   const handleSignOut = () => {
     signOut();

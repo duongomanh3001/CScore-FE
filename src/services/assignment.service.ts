@@ -212,18 +212,31 @@ class AssignmentServiceClass {
   }
 
   async runQuestionCode(assignmentId: number, questionId: number, code: string, language: string, input?: string): Promise<CodeExecutionResponse> {
-    return apiClient.post<CodeExecutionResponse>(`/api/student/assignments/${assignmentId}/questions/${questionId}/run`, {
+    // Run code with custom input (for testing, no grading)
+    const result = await apiClient.post<CodeExecutionResponse>(`/api/student/check-question-code`, {
+      questionId,
       code,
       language,
       input
     });
+    
+    // Add context message for run mode
+    if (result && input) {
+      result.message = "Chạy code với input tùy chỉnh - Kết quả chỉ để tham khảo, không tính điểm.";
+    }
+    
+    return result;
   }
 
   async testQuestionCode(assignmentId: number, questionId: number, code: string, language: string): Promise<CodeExecutionResponse> {
-    return apiClient.post<CodeExecutionResponse>(`/api/student/assignments/${assignmentId}/questions/${questionId}/test`, {
+    // Test code with teacher's test cases (with grading)
+    const result = await apiClient.post<CodeExecutionResponse>(`/api/student/check-question-code`, {
+      questionId,
       code,
       language
     });
+    
+    return result;
   }
 
   // Check question code with test cases (similar to Moodle CodeRunner)
@@ -261,6 +274,46 @@ class AssignmentServiceClass {
     } catch (error) {
       throw new Error('Failed to check question code');
     }
+  }
+
+  // Teacher-specific code validation for answer checking
+  async validateAnswerCode(answerCode: string, testCode: string, language: string = 'c', input?: string): Promise<CodeExecutionResponse> {
+    // Combine the answer code with the test code for execution
+    const combinedCode = `#include <stdio.h>\n#include <string.h>\n\n${answerCode}\n\nint main() {\n    ${testCode}\n    return 0;\n}`;
+    
+    console.log('Sending code to backend:', {
+      combinedCode,
+      language,
+      input: input || ''
+    });
+    
+    return apiClient.post<CodeExecutionResponse>('/api/teacher/validate-code', {
+      code: combinedCode,
+      language: language,
+      input: input || ''
+    });
+  }
+
+  // Batch validation for multiple test cases
+  async validateMultipleTestCases(answerCode: string, testCases: Array<{testCode: string, input: string}>, language: string = 'c'): Promise<Array<{output: string, error?: string}>> {
+    const results = [];
+    
+    for (const testCase of testCases) {
+      try {
+        const result = await this.validateAnswerCode(answerCode, testCase.testCode, language, testCase.input);
+        results.push({
+          output: result.output || '',
+          error: result.error
+        });
+      } catch (error) {
+        results.push({
+          output: '',
+          error: `Execution failed: ${error}`
+        });
+      }
+    }
+    
+    return results;
   }
 
   // Helper method to transform teacher assignment
