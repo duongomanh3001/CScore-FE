@@ -23,25 +23,6 @@ export class HealthService {
     }
   }
 
-  /**
-   * Get backend status info
-   */
-  static async getBackendStatus(): Promise<{
-    isAvailable: boolean;
-    baseUrl: string;
-    message: string;
-  }> {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8086';
-    const isAvailable = await this.checkHealth();
-    
-    return {
-      isAvailable,
-      baseUrl,
-      message: isAvailable 
-        ? 'Backend is available'
-        : 'Backend is not available. Please make sure the Spring Boot application is running.',
-    };
-  }
 }
 
 export default HealthService;

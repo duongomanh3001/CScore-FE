@@ -45,7 +45,7 @@ export default function ResultPage({ params }: Props) {
         setAssignment(assignmentData);
         
         // Filter submissions for this assignment
-        const assignmentSubmissions = submissionsData.filter(s => s.assignment?.id === assignmentId);
+        const assignmentSubmissions = submissionsData.filter(s => s.assignmentId === assignmentId);
         setSubmissions(assignmentSubmissions);
         
       } catch (err) {
@@ -63,7 +63,7 @@ export default function ResultPage({ params }: Props) {
       try {
         const submissionsData = await AssignmentService.getMySubmissions();
         const assignmentId = parseInt(resolvedParams.aid);
-        const assignmentSubmissions = submissionsData.filter(s => s.assignment?.id === assignmentId);
+        const assignmentSubmissions = submissionsData.filter(s => s.assignmentId === assignmentId);
         
         // Check if any submission is still being graded
         const hasProcessing = assignmentSubmissions.some(s => 
@@ -198,7 +198,7 @@ export default function ResultPage({ params }: Props) {
                     <div className="space-y-2">
                       <div>
                         <div className="text-slate-600">Ngôn ngữ</div>
-                        <div className="font-medium">{latestSubmission.language}</div>
+                        <div className="font-medium">{latestSubmission.programmingLanguage}</div>
                       </div>
                       <div>
                         <div className="text-slate-600">Thời gian nộp</div>

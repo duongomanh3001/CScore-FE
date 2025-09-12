@@ -29,23 +29,23 @@ export default function AssignmentCard({ assignment }: AssignmentCardProps) {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+    <div className="bg-white border border-primary-200 rounded-lg p-4 hover:shadow-sm transition-shadow hover:border-primary-300">
       <div className="flex items-start justify-between mb-2">
-        <h3 className="font-semibold text-slate-900 text-sm line-clamp-1">{assignment.title}</h3>
+        <h3 className="font-semibold text-primary text-sm line-clamp-1">{assignment.title}</h3>
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(assignment.type)}`}>
           {getTypeText(assignment.type)}
         </span>
       </div>
       
-      <p className="text-sm text-slate-600 mb-3 line-clamp-2">{assignment.description}</p>
+      <p className="text-sm text-primary-600 mb-3 line-clamp-2">{assignment.description}</p>
       
       <div className="space-y-2">
-        <div className="flex justify-between text-xs text-slate-500">
+        <div className="flex justify-between text-xs text-primary-400">
           <span>Khóa học: {assignment.courseName || 'N/A'}</span>
           <span>Điểm tối đa: {assignment.maxScore}</span>
         </div>
         
-        <div className="flex justify-between text-xs text-slate-500">
+        <div className="flex justify-between text-xs text-primary-400">
           <span>Loại: {getTypeText(assignment.type)}</span>
           <span>Thời gian: {assignment.timeLimit} phút</span>
         </div>

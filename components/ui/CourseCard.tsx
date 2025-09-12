@@ -19,7 +19,7 @@ export default function CourseCard({ title, code, percent = 0, gradient = "from-
       <div className={`h-28 bg-gradient-to-r ${gradient}`}>
         {logoText && (
           <div className="h-full w-full flex items-center justify-center">
-            <span className="bg-white/90 text-slate-800 text-sm font-semibold px-3 py-1 rounded">
+            <span className="bg-white/90 text-primary text-sm font-semibold px-3 py-1 rounded">
               {logoText}
             </span>
           </div>
@@ -28,14 +28,14 @@ export default function CourseCard({ title, code, percent = 0, gradient = "from-
       <div className="px-4 py-3 text-sm">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <div className="font-medium text-slate-800 leading-snug line-clamp-2">{title}</div>
-            <div className="text-[11px] text-slate-500 mt-1">{code}</div>
+            <div className="font-medium text-primary leading-snug line-clamp-2">{title}</div>
+            <div className="text-[11px] text-primary-400 mt-1">{code}</div>
           </div>
-          <button className="text-slate-400 hover:text-slate-600" aria-label="More">
+          <button className="text-primary-300 hover:text-primary-500" aria-label="More">
             ⋮
           </button>
         </div>
-        <div className="text-[11px] text-slate-500 mt-2">{percent}% complete</div>
+        <div className="text-[11px] text-primary-400 mt-2">{percent}% complete</div>
       </div>
       </Wrapper>
     </div>

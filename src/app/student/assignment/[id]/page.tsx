@@ -34,13 +34,9 @@ function AssignmentRedirect({ params }: Props) {
   }, [resolvedParams.id, router]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
-      <div className="animate-pulse">
-        <div className="h-6 bg-slate-200 rounded w-64 mb-2"></div>
-        <div className="h-4 bg-slate-200 rounded w-48 mb-6"></div>
-        <div className="text-slate-600">Đang chuyển hướng đến bài tập...</div>
-      </div>
-    </div>
+  
+  <div className="text-slate-600">Đang chuyển hướng đến bài tập...</div>
+    
   );
 }
 

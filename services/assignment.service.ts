@@ -226,6 +226,43 @@ class AssignmentServiceClass {
     });
   }
 
+  // Check question code with test cases (similar to Moodle CodeRunner)
+  async checkQuestionCode(params: { questionId: number; code: string; language: string }): Promise<any> {
+    try {
+      // Mock implementation for now - replace with actual API call
+      // return apiClient.post<any>(`/api/student/questions/${params.questionId}/check`, {
+      //   code: params.code,
+      //   language: params.language
+      // });
+      
+      // Mock test results based on the provided image
+      if (params.code.includes('def sqr(n):') && params.code.includes('return n * n')) {
+        return {
+          success: true,
+          score: 1.0,
+          testCases: [
+            { input: 'print(sqr(-3))', expected: '9', actual: '9', passed: true },
+            { input: 'print(sqr(11))', expected: '121', actual: '121', passed: true },
+            { input: 'print(sqr(-4))', expected: '16', actual: '16', passed: true },
+            { input: 'print(sqr(0))', expected: '0', actual: '0', passed: true }
+          ]
+        };
+      } else {
+        return {
+          success: false,
+          score: 0,
+          testCases: [
+            { input: 'print(sqr(-3))', expected: '9', actual: 'undefined', passed: false },
+            { input: 'print(sqr(11))', expected: '121', actual: 'undefined', passed: false }
+          ],
+          error: 'Function sqr() is not defined or incorrect implementation'
+        };
+      }
+    } catch (error) {
+      throw new Error('Failed to check question code');
+    }
+  }
+
   // Helper method to transform teacher assignment
   private transformTeacherAssignment(assignment: any): AssignmentResponse {
     const transformed: AssignmentResponse = {

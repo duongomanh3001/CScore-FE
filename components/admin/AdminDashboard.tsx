@@ -109,9 +109,7 @@ export default function AdminDashboard() {
               <p className="text-sm font-medium text-slate-500">Sinh viên</p>
               <p className="text-2xl font-bold text-slate-900">{stats.totalStudents}</p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">🎓</span>
-            </div>
+      
           </div>
         </div>
 
@@ -121,9 +119,7 @@ export default function AdminDashboard() {
               <p className="text-sm font-medium text-slate-500">Giáo viên</p>
               <p className="text-2xl font-bold text-slate-900">{stats.totalTeachers}</p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">👨‍🏫</span>
-            </div>
+          
           </div>
         </div>
 
@@ -133,9 +129,7 @@ export default function AdminDashboard() {
               <p className="text-sm font-medium text-slate-500">Tổng số khóa học</p>
               <p className="text-2xl font-bold text-slate-900">{stats.totalCourses}</p>
             </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">📚</span>
-            </div>
+          
           </div>
         </div>
 
@@ -145,9 +139,7 @@ export default function AdminDashboard() {
               <p className="text-sm font-medium text-slate-500">Khóa học đang hoạt động</p>
               <p className="text-2xl font-bold text-slate-900">{stats.activeCourses}</p>
             </div>
-            <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">✅</span>
-            </div>
+          
           </div>
         </div>
 
@@ -157,9 +149,7 @@ export default function AdminDashboard() {
               <p className="text-sm font-medium text-slate-500">Tổng số bài tập</p>
               <p className="text-2xl font-bold text-slate-900">{stats.totalAssignments}</p>
             </div>
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">📝</span>
-            </div>
+     
           </div>
         </div>
       </div>
@@ -172,28 +162,28 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('courses')}
             className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
           >
-            <div className="text-2xl mb-2">➕</div>
+       
             <div className="text-sm font-medium text-emerald-800">Tạo khóa học</div>
           </button>
           <button
             onClick={() => setActiveTab('users')}
             className="p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
           >
-            <div className="text-2xl mb-2">👤</div>
+    
             <div className="text-sm font-medium text-blue-800">Quản lý user</div>
           </button>
           <button
             onClick={() => setActiveTab('reports')}
             className="p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
           >
-            <div className="text-2xl mb-2">📊</div>
+        
             <div className="text-sm font-medium text-purple-800">Xem báo cáo</div>
           </button>
           <button
             onClick={loadDashboardStats}
             className="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <div className="text-2xl mb-2">🔄</div>
+           
             <div className="text-sm font-medium text-gray-800">Làm mới</div>
           </button>
         </div>
@@ -220,11 +210,10 @@ export default function AdminDashboard() {
           >
             <div className="flex items-center">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                <span className="text-2xl">👨‍🏫</span>
               </div>
               <div>
-                <h4 className="font-medium text-purple-900">Import Giáo Viên</h4>
-                <p className="text-sm text-purple-700">Thêm nhiều giáo viên cùng lúc</p>
+                <h4 className="font-medium text-purple-900">import giáo viên</h4>
+  
               </div>
             </div>
           </button>
@@ -241,8 +230,8 @@ export default function AdminDashboard() {
                 <span className="text-2xl">🎓</span>
               </div>
               <div>
-                <h4 className="font-medium text-green-900">Import Sinh Viên</h4>
-                <p className="text-sm text-green-700">Thêm nhiều sinh viên cùng lúc</p>
+                <h4 className="font-medium text-green-900">import sinh viên</h4>
+     
               </div>
             </div>
           </button>

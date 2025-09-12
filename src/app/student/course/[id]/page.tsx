@@ -62,10 +62,10 @@ function CourseDetails({ params }: Props) {
       <MainLayout>
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="animate-pulse">
-            <div className="h-6 bg-slate-200 rounded w-64 mb-6"></div>
+            <div className="h-6 bg-primary-200 rounded w-64 mb-6"></div>
             <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-              <div className="h-64 bg-slate-200 rounded-lg"></div>
-              <div className="h-64 bg-slate-200 rounded-lg"></div>
+              <div className="h-64 bg-primary-200 rounded-lg"></div>
+              <div className="h-64 bg-primary-200 rounded-lg"></div>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@ function CourseDetails({ params }: Props) {
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
             <p className="text-red-600">{error || 'Không tìm thấy khóa học'}</p>
           </div>
-          <Link className="text-blue-600 hover:underline" href="/student">← Quay lại danh sách khóa học</Link>
+          <Link className="text-primary hover:underline" href="/student">← Quay lại danh sách khóa học</Link>
         </div>
       </MainLayout>
     );
@@ -90,37 +90,37 @@ function CourseDetails({ params }: Props) {
     <MainLayout>
       <div className="mx-auto max-w-7xl px-4 py-6">
         <div className="mb-4">
-          <h1 className="text-[#ff6a00] font-semibold text-xl">{course.name}</h1>
-          <p className="text-slate-600 text-sm mt-1">{course.code} - {course.description}</p>
+          <h1 className="text-primary font-semibold text-xl">{course.name}</h1>
+          <p className="text-primary-400 text-sm mt-1">{course.code} - {course.description}</p>
         </div>
 
       <div className="mt-4 grid gap-6 grid-cols-1 md:grid-cols-[240px_1fr]">
         {/* Left sidebar */}
-        <aside className="rounded-md border bg-white">
-          <div className="p-4 border-b text-sm font-medium">
+        <aside className="rounded-md border border-primary-200 bg-white">
+          <div className="p-4 border-b border-primary-100 text-sm font-medium text-primary">
             {course.name}
           </div>
           <nav className="text-sm">
-            <a className="block px-4 py-2 bg-emerald-600 text-white" href="#">Khóa học</a>
-            <a className="block px-4 py-2 hover:bg-slate-50" href="#">Danh sách thành viên</a>
-            <a className="block px-4 py-2 hover:bg-slate-50" href="#">Điểm số</a>
-            <a className="block px-4 py-2 hover:bg-slate-50" href="#">Năng lực</a>
-            <a className="block px-4 py-2 hover:bg-slate-50 text-rose-600" href="#">Thực Hành</a>
-            <a className="block px-4 py-2 hover:bg-slate-50" href="#">Mở rộng tất cả</a>
+            <a className="block px-4 py-2 bg-primary text-white" href="#">Khóa học</a>
+            <a className="block px-4 py-2 hover:bg-primary-50 text-primary" href="#">Danh sách thành viên</a>
+            <a className="block px-4 py-2 hover:bg-primary-50 text-primary" href="#">Điểm số</a>
+            <a className="block px-4 py-2 hover:bg-primary-50 text-primary" href="#">Năng lực</a>
+            <a className="block px-4 py-2 hover:bg-primary-50 text-rose-600" href="#">Thực Hành</a>
+            <a className="block px-4 py-2 hover:bg-primary-50 text-primary" href="#">Mở rộng tất cả</a>
           </nav>
         </aside>
 
         {/* Main content */}
         <section>
-          <div className="rounded-md border bg-white">
-            <div className="flex items-center gap-4 border-b px-4">
+          <div className="rounded-md border border-primary-200 bg-white">
+            <div className="flex items-center gap-4 border-b border-primary-100 px-4">
               {(["Khóa học", "Danh sách thành viên", "Điểm số", "Năng lực"] as const).map((t, i) => (
-                <button key={i} className={`h-10 px-3 text-sm ${i === 0 ? "border-b-2 border-emerald-600 text-emerald-700" : "text-slate-600"}`}>{t}</button>
+                <button key={i} className={`h-10 px-3 text-sm ${i === 0 ? "border-b-2 border-primary text-primary-600" : "text-primary-400"}`}>{t}</button>
               ))}
             </div>
             <div className="p-3 space-y-3">
               {assignments.length === 0 ? (
-                <div className="text-center py-8 text-slate-500">
+                <div className="text-center py-8 text-primary-400">
                   Chưa có bài tập nào trong khóa học này
                 </div>
               ) : (
@@ -128,33 +128,32 @@ function CourseDetails({ params }: Props) {
                   <Link 
                     href={`/student/course/${course.id}/assignment/${assignment.id}`} 
                     key={assignment.id} 
-                    className="block rounded-md border bg-white p-3 hover:shadow-sm hover:bg-slate-50 transition-all"
+                    className="assignment-link block rounded-md border border-primary-200 bg-white p-3 hover:shadow-md hover:bg-primary-50 hover:border-primary-300 transition-all"
                   > 
                     <div className="flex items-center gap-2 text-sm">
-                      <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-rose-600 text-white text-xs">📄</span>
-                      <div className="font-medium flex-1">{assignment.title}</div>
+                      <div className="font-medium flex-1 text-primary">{assignment.title}</div>
                       <div className="flex items-center gap-2">
                         <span className={`text-[11px] rounded px-2 py-0.5 font-medium ${
-                          assignment.type === 'EXERCISE' ? 'bg-blue-100 text-blue-800' :
+                          assignment.type === 'EXERCISE' ? 'bg-primary-100 text-primary-800' :
                           assignment.type === 'EXAM' ? 'bg-red-100 text-red-800' :
                           assignment.type === 'PROJECT' ? 'bg-orange-100 text-orange-800' :
                           assignment.type === 'QUIZ' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-primary-100 text-primary-800'
                         }`}>
                           {assignment.type === 'EXERCISE' ? 'Bài tập' :
                            assignment.type === 'EXAM' ? 'Bài thi' :
                            assignment.type === 'PROJECT' ? 'Dự án' :
                            assignment.type === 'QUIZ' ? 'Kiểm tra nhanh' : assignment.type}
                         </span>
-                        <span className="text-[11px] rounded bg-emerald-400/90 px-2 py-0.5 text-white">
+                        <span className="text-[11px] rounded bg-primary-600 px-2 py-0.5 text-white font-medium">
                           {assignment.maxScore} điểm
                         </span>
                       </div>
                     </div>
                     {assignment.description && (
-                      <p className="mt-2 text-sm text-slate-700 line-clamp-2">{assignment.description}</p>
+                      <p className="mt-2 text-sm text-primary font-medium line-clamp-2">{assignment.description}</p>
                     )}
-                    <div className="mt-2 flex items-center justify-between text-xs text-slate-600">
+                    <div className="mt-2 flex items-center justify-between text-xs text-primary font-medium">
                       <div className="flex items-center gap-4">
                         {assignment.totalQuestions > 0 && (
                           <span className="font-medium">
@@ -170,7 +169,7 @@ function CourseDetails({ params }: Props) {
                       <div className="ml-auto flex items-center gap-2">
                         <span>Thời gian: {assignment.timeLimit} phút</span>
                         {assignment.isSubmitted && (
-                          <span className="text-emerald-600 font-medium">✓ Đã nộp</span>
+                          <span className="text-primary-600 font-medium">✓ Đã nộp</span>
                         )}
                       </div>
                     </div>

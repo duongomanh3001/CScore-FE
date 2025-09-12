@@ -242,9 +242,8 @@ export interface StudentQuestionResponse {
 
 export interface SubmissionRequest {
   assignmentId: number;
-  code?: string;
-  programmingLanguage?: string;
-  answers?: QuestionAnswerRequest[];
+  code: string;
+  programmingLanguage: string;
 }
 
 export interface QuestionAnswerRequest {
@@ -256,23 +255,20 @@ export interface QuestionAnswerRequest {
 
 export interface SubmissionResponse {
   id: number;
-  code: string;
-  language: string;
-  score?: number;
+  assignmentId: number;
+  assignmentTitle: string;
+  studentName: string;
+  studentId: string;
+  programmingLanguage: string;
   status: 'NOT_SUBMITTED' | 'SUBMITTED' | 'GRADING' | 'GRADED' | 'PASSED' | 'PARTIAL' | 'FAILED' | 'COMPILATION_ERROR' | 'ERROR' | 'NO_TESTS' | 'LATE' | 'PENDING' | 'COMPILE_ERROR' | 'RUNTIME_ERROR';
+  score?: number;
+  executionTime?: number;
+  memoryUsed?: number;
   feedback?: string;
   submissionTime: string;
-  testResults?: TestResultResponse[];
-  assignment?: {
-    id: number;
-    title: string;
-    maxScore: number;
-  };
-  student?: {
-    id: number;
-    fullName: string;
-    studentId: string;
-  };
+  gradedTime?: string;
+  testCasesPassed?: number;
+  totalTestCases?: number;
 }
 
 export interface TestResultResponse {

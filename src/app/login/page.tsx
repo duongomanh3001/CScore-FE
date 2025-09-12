@@ -49,7 +49,7 @@ export default function LoginPage() {
         <div className="w-full max-w-xl mt-10 md:mt-0">
           <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
             <div className="px-6 pt-6 text-center">
-              <h1 className="text-[#ff6a00] font-bold text-xl leading-tight">
+              <h1 className="text-primary font-bold text-xl leading-tight">
                 CSCORE LOGIN
               </h1>
             </div>
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 placeholder="Tên tài khoản hoặc Email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full rounded-md border h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full rounded-md border border-primary-200 h-10 px-3 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 disabled={isLoading}
                 required
               />
@@ -73,14 +73,14 @@ export default function LoginPage() {
                 placeholder="Mật khẩu"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full rounded-md border border-primary-200 h-10 px-3 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 disabled={isLoading}
                 required
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-10 rounded-md bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full h-10 rounded-md bg-primary text-white text-sm font-medium hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
@@ -92,14 +92,14 @@ export default function LoginPage() {
                 )}
               </button>
               <div className="text-right">
-                <a href="#" className="text-emerald-700 text-sm">Quên mật khẩu?</a>
+                <a href="#" className="text-primary-600 text-sm hover:text-primary">Quên mật khẩu?</a>
               </div>
               <div className="flex items-center justify-between pt-2">
-                <select className="h-9 rounded-md border px-2 text-sm">
+                <select className="h-9 rounded-md border border-primary-200 px-2 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-primary">
                   <option>Vietnamese</option>
                   <option>English</option>
                 </select>
-                <button type="button" className="h-9 rounded-md border px-3 text-sm">
+                <button type="button" className="h-9 rounded-md border border-primary-200 px-3 text-sm text-primary hover:bg-primary-50">
                   Thông báo từ các Cookies
                 </button>
               </div>

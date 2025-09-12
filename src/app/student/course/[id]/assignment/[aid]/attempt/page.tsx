@@ -22,6 +22,8 @@ function AssignmentAttempt({ params }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkingQuestions, setCheckingQuestions] = useState<{ [questionId: number]: boolean }>({});
+  const [testResults, setTestResults] = useState<{ [questionId: number]: any }>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,6 +96,15 @@ function AssignmentAttempt({ params }: Props) {
       ...prev,
       [questionId]: { ...prev[questionId], answer }
     }));
+    
+    // Clear test results when code changes
+    if (testResults[questionId]) {
+      setTestResults(prev => {
+        const newResults = { ...prev };
+        delete newResults[questionId];
+        return newResults;
+      });
+    }
   };
 
   const handleOptionSelect = (questionId: number, optionId: number, isMultiple = false) => {
@@ -168,22 +179,38 @@ function AssignmentAttempt({ params }: Props) {
           return;
         }
 
+        // For programming assignment, send as legacy format (single code submission)
+        // Use the first programming answer or combine all codes
+        const primaryAnswer = programmingAnswers[0];
+        const allCodes = programmingAnswers.map(ans => ans.answer).join('\n\n// --- Next Question ---\n\n');
+        
         const submissionData = {
           assignmentId: assignment.id,
-          answers: programmingAnswers
+          code: allCodes,
+          programmingLanguage: primaryAnswer.language || 'C'
         };
 
         await AssignmentService.submitAssignment(submissionData);
       } else {
-        // Traditional multi-question assignment
+        // Traditional multi-question assignment - convert to legacy format
+        const allAnswers = assignment.questions?.map(question => {
+          const userAnswer = answers[question.id];
+          if (userAnswer?.answer) {
+            return `// Question ${question.id}: ${question.title || 'Question'}\n${userAnswer.answer}`;
+          }
+          return '';
+        }).filter(ans => ans.trim()).join('\n\n// --- Next Question ---\n\n') || '';
+
+        if (!allAnswers.trim()) {
+          setError('Vui lòng nhập câu trả lời cho ít nhất một câu hỏi');
+          setIsSubmitting(false);
+          return;
+        }
+        
         const submissionData = {
           assignmentId: assignment.id,
-          answers: assignment.questions?.map(question => ({
-            questionId: question.id,
-            answer: answers[question.id]?.answer || '',
-            selectedOptionIds: answers[question.id]?.selectedOptions || [],
-            language: 'javascript' // Default language, can be made configurable
-          })) || []
+          code: allAnswers,
+          programmingLanguage: 'javascript' // Default language, can be made configurable
         };
 
         await AssignmentService.submitAssignment(submissionData);
@@ -194,6 +221,47 @@ function AssignmentAttempt({ params }: Props) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi nộp bài');
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCheckQuestion = async (questionId: number) => {
+    const question = assignment?.questions?.find(q => q.id === questionId);
+    if (!question || !answers[questionId]?.answer) {
+      setError('Vui lòng nhập code trước khi kiểm tra');
+      return;
+    }
+
+    try {
+      setCheckingQuestions(prev => ({ ...prev, [questionId]: true }));
+      
+      const code = answers[questionId].answer;
+      let language = 'C';
+      
+      // Detect programming language
+      if (code.includes('public class') || code.includes('System.out.println') || code.includes('import java')) {
+        language = 'JAVA';
+      } else if (code.includes('print(') || code.includes('def ') || (code.includes('import ') && !code.includes('#include'))) {
+        language = 'PYTHON';
+      } else if (code.includes('#include') && (code.includes('iostream') || code.includes('vector') || code.includes('string>'))) {
+        language = 'CPP';
+      } else if (code.includes('#include') && (code.includes('stdio.h') || code.includes('printf') || code.includes('scanf'))) {
+        language = 'C';
+      }
+
+      // Call API to check code with test cases
+      const testResult = await AssignmentService.checkQuestionCode({
+        questionId,
+        code,
+        language
+      });
+      
+      setTestResults(prev => ({ ...prev, [questionId]: testResult }));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi kiểm tra code');
+      console.error('Error checking question:', err);
+    } finally {
+      setCheckingQuestions(prev => ({ ...prev, [questionId]: false }));
     }
   };
 
@@ -274,7 +342,7 @@ function AssignmentAttempt({ params }: Props) {
               onClick={() => window.location.reload()} 
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              🔄 Tải lại trang
+              Tải lại trang
             </button>
           </div>
         </div>
@@ -344,8 +412,168 @@ function AssignmentAttempt({ params }: Props) {
                   value={answers[currentQuestion.id]?.answer || ''}
                   onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
                   placeholder="// Viết code của bạn ở đây..."
-                  className="w-full min-h-[200px] rounded border p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full min-h-[200px] rounded border p-3 text-sm font-mono text-black focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
+                
+                {/* Warning about code changes */}
+                {testResults[currentQuestion.id] && (
+                  <div className="mt-2 text-xs text-orange-600 bg-orange-50 p-2 rounded">
+                    Code đã được thay đổi. Kết quả test trước đây có thể không còn chính xác.
+                  </div>
+                )}
+                
+                {/* Check button */}
+                <div className="mt-3 flex justify-between items-center">
+                  <div className="text-xs text-slate-500">
+                    {answers[currentQuestion.id]?.answer?.trim() ? (
+                      <span className="text-blue-600">✓ Code đã nhập - có thể kiểm tra</span>
+                    ) : (
+                      <span>Nhập code để có thể kiểm tra</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleCheckQuestion(currentQuestion.id)}
+                    disabled={checkingQuestions[currentQuestion.id] || !answers[currentQuestion.id]?.answer?.trim()}
+                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {checkingQuestions[currentQuestion.id] ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Đang kiểm tra...
+                      </>
+                    ) : (
+                      'Check'
+                    )}
+                  </button>
+                </div>
+
+                {/* Test Results */}
+                {testResults[currentQuestion.id] && (
+                  <div className="mt-4 border rounded-lg overflow-hidden">
+                    <div className="bg-slate-50 px-3 py-2 border-b">
+                      <h4 className="font-medium text-slate-700">Kết quả kiểm tra:</h4>
+                    </div>
+                    
+                    {testResults[currentQuestion.id].success ? (
+                      <div className="bg-green-50 p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                          </div>
+                          <span className="font-medium text-green-800">Passed all tests! ✓</span>
+                        </div>
+                        
+                        {testResults[currentQuestion.id].testCases && (
+                          <div className="space-y-2">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="bg-green-100">
+                                  <th className="text-left px-3 py-1 border">Test</th>
+                                  <th className="text-left px-3 py-1 border">Expected</th>
+                                  <th className="text-left px-3 py-1 border">Got</th>
+                                  <th className="text-center px-3 py-1 border w-12"></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {testResults[currentQuestion.id].testCases.map((test: any, index: number) => (
+                                  <tr key={index} className="bg-white">
+                                    <td className="px-3 py-1 border font-mono text-xs">{test.input}</td>
+                                    <td className="px-3 py-1 border font-mono text-xs">{test.expected}</td>
+                                    <td className="px-3 py-1 border font-mono text-xs">{test.actual}</td>
+                                    <td className="px-3 py-1 border text-center">
+                                      <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+                                        <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                        
+                        <div className="mt-3 text-sm">
+                          <div className="bg-green-600 text-white px-2 py-1 rounded inline-block">
+                            Correct
+                          </div>
+                          <span className="ml-2 text-green-700">
+                            Marks for this submission: {testResults[currentQuestion.id].score || currentQuestion.points}/{currentQuestion.points}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-red-50 p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                          </div>
+                          <span className="font-medium text-red-800">Test failed</span>
+                        </div>
+                        
+                        {testResults[currentQuestion.id].testCases && (
+                          <div className="space-y-2">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="bg-red-100">
+                                  <th className="text-left px-3 py-1 border">Test</th>
+                                  <th className="text-left px-3 py-1 border">Expected</th>
+                                  <th className="text-left px-3 py-1 border">Got</th>
+                                  <th className="text-center px-3 py-1 border w-12"></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {testResults[currentQuestion.id].testCases.map((test: any, index: number) => (
+                                  <tr key={index} className={test.passed ? "bg-green-50" : "bg-red-50"}>
+                                    <td className="px-3 py-1 border font-mono text-xs">{test.input}</td>
+                                    <td className="px-3 py-1 border font-mono text-xs">{test.expected}</td>
+                                    <td className="px-3 py-1 border font-mono text-xs">{test.actual}</td>
+                                    <td className="px-3 py-1 border text-center">
+                                      {test.passed ? (
+                                        <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+                                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                                          </svg>
+                                        </div>
+                                      ) : (
+                                        <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center mx-auto">
+                                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path>
+                                          </svg>
+                                        </div>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+
+                        {testResults[currentQuestion.id].error && (
+                          <div className="mt-3 p-3 bg-red-100 rounded border border-red-200">
+                            <h5 className="font-medium text-red-800 mb-1">Runtime Error:</h5>
+                            <pre className="text-xs text-red-700 whitespace-pre-wrap">{testResults[currentQuestion.id].error}</pre>
+                          </div>
+                        )}
+                        
+                        <div className="mt-3 text-sm">
+                          <div className="bg-red-600 text-white px-2 py-1 rounded inline-block">
+                            Incorrect
+                          </div>
+                          <span className="ml-2 text-red-700">
+                            Marks for this submission: 0.00/{currentQuestion.points}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -418,20 +646,44 @@ function AssignmentAttempt({ params }: Props) {
             {questions.map((question, index) => {
               const isAnswered = answers[question.id]?.answer || 
                 (answers[question.id]?.selectedOptions && answers[question.id]?.selectedOptions!.length > 0);
+              const hasTestResult = testResults[question.id];
+              const testPassed = hasTestResult?.success;
               
               return (
                 <button
                   key={question.id}
                   onClick={() => setCurrentQuestionIndex(index)}
-                  className={`h-8 w-8 rounded border text-sm font-medium ${
+                  className={`h-8 w-8 rounded border text-sm font-medium relative ${
                     index === currentQuestionIndex
                       ? 'bg-emerald-600 text-white'
+                      : testPassed
+                      ? 'bg-green-200 text-green-800 border-green-400'
+                      : hasTestResult && !testPassed
+                      ? 'bg-red-200 text-red-800 border-red-400'
                       : isAnswered
-                      ? 'bg-green-100 text-green-700 border-green-300'
+                      ? 'bg-blue-100 text-blue-700 border-blue-300'
                       : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'
                   }`}
                 >
                   {index + 1}
+                  {/* Test result indicator */}
+                  {hasTestResult && (
+                    <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${
+                      testPassed ? 'bg-green-500' : 'bg-red-500'
+                    }`}>
+                      <div className="w-full h-full flex items-center justify-center">
+                        {testPassed ? (
+                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                        ) : (
+                          <svg className="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path>
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </button>
               );
             })}
@@ -439,7 +691,15 @@ function AssignmentAttempt({ params }: Props) {
 
           <div className="text-xs text-slate-600 mb-4">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-3 h-3 bg-green-100 border border-green-300 rounded"></div>
+              <div className="w-3 h-3 bg-green-200 border border-green-400 rounded"></div>
+              <span>Test passed</span>
+            </div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-3 h-3 bg-red-200 border border-red-400 rounded"></div>
+              <span>Test failed</span>
+            </div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded"></div>
               <span>Đã trả lời</span>
             </div>
             <div className="flex items-center gap-2 mb-1">
@@ -455,6 +715,7 @@ function AssignmentAttempt({ params }: Props) {
           <div className="border-t pt-4">
             <div className="text-sm text-slate-600 mb-4">
               <div>Đã trả lời: {Object.values(answers).filter(a => a.answer || (a.selectedOptions && a.selectedOptions.length > 0)).length}/{questions.length}</div>
+              <div>Test passed: {Object.values(testResults).filter(r => r.success).length}/{questions.filter(q => q.questionType === 'PROGRAMMING').length}</div>
               <div>Tổng điểm: {questions.reduce((sum, q) => sum + q.points, 0)}</div>
             </div>
             

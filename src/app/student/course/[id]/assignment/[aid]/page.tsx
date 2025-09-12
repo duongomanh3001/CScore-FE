@@ -59,8 +59,8 @@ function AssignmentDetails({ params }: Props) {
       <MainLayout>
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="animate-pulse">
-            <div className="h-6 bg-slate-200 rounded w-64 mb-4"></div>
-            <div className="h-64 bg-slate-200 rounded-lg"></div>
+            <div className="h-6 bg-primary-200 rounded w-64 mb-4"></div>
+            <div className="h-64 bg-primary-200 rounded-lg"></div>
           </div>
         </div>
       </MainLayout>
@@ -74,7 +74,7 @@ function AssignmentDetails({ params }: Props) {
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
             <p className="text-red-600">{error || 'Không tìm thấy bài tập'}</p>
           </div>
-          <Link href={`/student/course/${resolvedParams.id}`} className="text-blue-600 hover:underline">← Quay lại khóa học</Link>
+          <Link href={`/student/course/${resolvedParams.id}`} className="text-primary hover:underline">← Quay lại khóa học</Link>
         </div>
       </MainLayout>
     );
@@ -84,7 +84,7 @@ function AssignmentDetails({ params }: Props) {
     <MainLayout>
       <div className="mx-auto max-w-7xl px-4 py-6">
         {/* breadcrumb-like header */}
-      <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="flex items-center gap-2 text-xs text-primary-400">
         <Link href="/student" className="hover:underline">Trang chủ</Link>
         <span>/</span>
         <Link href={`/student/course/${course.id}`} className="hover:underline">{course.name}</Link>
@@ -104,48 +104,47 @@ function AssignmentDetails({ params }: Props) {
         </span>
       </div>
 
-      <div className="mt-3 rounded-md border bg-white">
-        <div className="p-4 border-b">
-          <div className="text-sm text-rose-600 font-medium flex items-center gap-2">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-rose-600 text-white text-xs">📄</span>
+      <div className="mt-3 rounded-md border border-primary-200 bg-white">
+        <div className="p-4 border-b border-primary-100">
+          <div className="text-sm text-primary-600 font-medium flex items-center gap-2">
             Bài tập lập trình
           </div>
-          <h1 className="text-lg font-semibold mt-2">{assignment.title}</h1>
-          <div className="mt-2 text-sm space-y-1 text-slate-600">
-            <div><span className="font-semibold">Điểm tối đa:</span> {assignment.maxScore}</div>
-            <div><span className="font-semibold">Thời gian giới hạn:</span> {assignment.timeLimit} phút</div>
+          <h1 className="text-lg font-semibold mt-2 text-primary">{assignment.title}</h1>
+          <div className="mt-2 text-sm space-y-1 text-primary-500">
+            <div><span className="font-semibold text-primary">Điểm tối đa:</span> {assignment.maxScore}</div>
+            <div><span className="font-semibold text-primary">Thời gian giới hạn:</span> {assignment.timeLimit} phút</div>
             {assignment.endTime && (
-              <div><span className="font-semibold">Hạn nộp:</span> {formatDate(assignment.endTime)}</div>
+              <div><span className="font-semibold text-primary">Hạn nộp:</span> {formatDate(assignment.endTime)}</div>
             )}
           </div>
         </div>
 
         <div className="p-4">
-          <h2 className="text-rose-600 font-semibold">Mô tả bài tập</h2>
+          <h2 className="text-primary-600 font-semibold">Mô tả bài tập</h2>
           <div className="mt-3 text-sm">
-            <div className="bg-slate-50 border rounded-lg p-4">
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
               <div className="prose prose-sm max-w-none">
                 {assignment.description && (
                   <div className="mb-4">
-                    <h3 className="font-semibold text-slate-900">Mô tả:</h3>
-                    <p className="text-slate-700 whitespace-pre-wrap">{assignment.description}</p>
+                    <h3 className="font-semibold text-primary">Mô tả:</h3>
+                    <p className="text-primary-600 whitespace-pre-wrap">{assignment.description}</p>
                   </div>
                 )}
                 {assignment.requirements && (
                   <div className="mb-4">
-                    <h3 className="font-semibold text-slate-900">Yêu cầu:</h3>
-                    <p className="text-slate-700 whitespace-pre-wrap">{assignment.requirements}</p>
+                    <h3 className="font-semibold text-primary">Yêu cầu:</h3>
+                    <p className="text-primary-600 whitespace-pre-wrap">{assignment.requirements}</p>
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <h3 className="font-semibold text-slate-900">Số câu hỏi:</h3>
-                    <p className="text-slate-700">{assignment.totalQuestions || 1} câu</p>
+                    <h3 className="font-semibold text-primary">Số câu hỏi:</h3>
+                    <p className="text-primary-600">{assignment.totalQuestions || 1} câu</p>
                   </div>
                   {assignment.totalTestCases > 0 && (
                     <div>
-                      <h3 className="font-semibold text-slate-900">Test Cases:</h3>
-                      <p className="text-slate-700">{assignment.totalTestCases} test cases</p>
+                      <h3 className="font-semibold text-primary">Test Cases:</h3>
+                      <p className="text-primary-600">{assignment.totalTestCases} test cases</p>
                     </div>
                   )}
                 </div>
@@ -156,12 +155,12 @@ function AssignmentDetails({ params }: Props) {
           {/* Questions Preview */}
           {assignment.questions && assignment.questions.length > 0 && (
             <>
-              <h2 className="text-rose-600 font-semibold mt-6">Danh sách câu hỏi</h2>
+              <h2 className="text-primary-600 font-semibold mt-6">Danh sách câu hỏi</h2>
               <div className="mt-3 space-y-3">
                 {assignment.questions.map((question, index) => (
-                  <div key={question.id} className="border border-slate-200 rounded-lg p-4">
+                  <div key={question.id} className="border border-primary-200 rounded-lg p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-slate-900">
+                      <h3 className="font-semibold text-primary">
                         Câu {index + 1}: {question.title}
                       </h3>
                       <div className="flex gap-2">
@@ -176,17 +175,17 @@ function AssignmentDetails({ params }: Props) {
                            question.questionType === 'ESSAY' ? 'Tự luận' :
                            question.questionType === 'TRUE_FALSE' ? 'Đúng/Sai' : question.questionType}
                         </span>
-                        <span className="text-xs px-2 py-1 bg-slate-100 text-slate-800 rounded font-medium">
+                        <span className="text-xs px-2 py-1 bg-primary-100 text-primary-800 rounded font-medium">
                           {question.points} điểm
                         </span>
                       </div>
                     </div>
                     
-                    <p className="text-sm text-slate-600 mb-2">
+                    <p className="text-sm text-primary-600 mb-2">
                       {question.description}
                     </p>
                     
-                    <div className="text-xs text-slate-500 flex gap-4">
+                    <div className="text-xs text-primary-400 flex gap-4">
                       <span>Thứ tự: {question.orderIndex}</span>
                       {question.publicTestCases && question.publicTestCases.length > 0 && (
                         <span>Test cases công khai: {question.publicTestCases.length}</span>
@@ -204,42 +203,42 @@ function AssignmentDetails({ params }: Props) {
             </>
           )}
 
-          <h2 className="text-rose-600 font-semibold mt-6">Trạng thái bài nộp</h2>
+          <h2 className="text-primary-600 font-semibold mt-6">Trạng thái bài nộp</h2>
           <div className="grid md:grid-cols-2 gap-6 mt-3 text-sm">
-            <div className="rounded-md border bg-white p-4">
+            <div className="rounded-md border border-primary-200 bg-white p-4">
               <div className="space-y-2">
                 <div>
-                  <div className="text-slate-600">Trạng thái bài nộp</div>
-                  <div className="font-medium">
+                  <div className="text-primary-400">Trạng thái bài nộp</div>
+                  <div className="font-medium text-primary">
                     {assignment.isSubmitted ? 'Đã nộp bài' : 'Chưa nộp bài'}
                   </div>
                 </div>
                 <div>
-                  <div className="text-slate-600">Điểm tốt nhất</div>
-                  <div className="font-medium text-emerald-600">
+                  <div className="text-primary-400">Điểm tốt nhất</div>
+                  <div className="font-medium text-primary-600">
                     {assignment.currentScore !== undefined && assignment.currentScore !== null ? `${assignment.currentScore}/${assignment.maxScore}` : 'Chưa có điểm'}
                   </div>
                 </div>
                 {assignment.submissionTime && (
                   <div>
-                    <div className="text-slate-600">Thời gian nộp</div>
-                    <div className="text-slate-700">{formatDate(assignment.submissionTime)}</div>
+                    <div className="text-primary-400">Thời gian nộp</div>
+                    <div className="text-primary-600">{formatDate(assignment.submissionTime)}</div>
                   </div>
                 )}
               </div>
             </div>
-            <div className="rounded-md border bg-white p-4">
+            <div className="rounded-md border border-primary-200 bg-white p-4">
               <div className="space-y-2">
                 <div>
-                  <div className="text-slate-600">Trạng thái chấm điểm</div>
-                  <div className="font-medium">
+                  <div className="text-primary-400">Trạng thái chấm điểm</div>
+                  <div className="font-medium text-primary">
                     {assignment.submissionStatus === 'GRADED' ? 'Đã chấm điểm' : 
                      assignment.submissionStatus === 'SUBMITTED' ? 'Chờ chấm điểm' : 'Chưa chấm điểm'}
                   </div>
                 </div>
                 <div>
-                  <div className="text-slate-600">Tạo lúc</div>
-                  <div className="font-medium">{formatDate(assignment.createdAt)}</div>
+                  <div className="text-primary-400">Tạo lúc</div>
+                  <div className="font-medium text-primary">{formatDate(assignment.createdAt)}</div>
                 </div>
               </div>
             </div>
@@ -248,7 +247,7 @@ function AssignmentDetails({ params }: Props) {
           <div className="mt-6 flex items-center justify-center">
             <Link 
               href={`/student/course/${course.id}/assignment/${assignment.id}/attempt`} 
-              className="h-10 inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
+              className="h-10 inline-flex items-center justify-center rounded-md bg-primary px-4 text-white text-sm font-medium hover:bg-primary-600 transition-colors"
             >
               Bắt đầu làm bài
             </Link>
